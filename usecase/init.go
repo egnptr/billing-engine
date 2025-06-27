@@ -17,7 +17,7 @@ func NewLoan(id int64, amount float64, interestRate float64, weeks int) (*Loan, 
 	installment := total / float64(weeks)
 
 	if total == 0 || installment == 0 {
-		return &Loan{}, fmt.Errorf("invalid load")
+		return &Loan{}, fmt.Errorf("invalid loan")
 	}
 
 	return &Loan{
