@@ -16,7 +16,7 @@ func main() {
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Hello World")
 	}).Methods("GET")
-	r.HandleFunc("/loan/{id}", handlers.CreateLoan).Methods("POST")
+	r.HandleFunc("/loan", handlers.CreateLoan).Methods("POST")
 	r.HandleFunc("/loan/{id}", handlers.GetLoan).Methods("GET")
 	r.HandleFunc("/loan/{id}/payment", handlers.MakePayment).Methods("POST")
 	r.HandleFunc("/loan/{id}/outstanding", handlers.GetOutstanding).Methods("GET")
