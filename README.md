@@ -1,5 +1,17 @@
 # billing-engine
 
+## Features
+
+- Create a loan with initial amount, interest, and duration
+- Track weekly payments and outstanding balance
+- Handle missed payments and enforce repayment catch-up 
+- Check if borrower is delinquent (missed 2 consecutive payments)
+
+## Restriction
+
+- Total week duration are not expandable
+- Loan must be completed on designated week
+
 ## Getting Started
 
 ### Install Dependencies
