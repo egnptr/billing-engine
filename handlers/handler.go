@@ -163,6 +163,7 @@ func GetLoan(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Loan not found", http.StatusBadRequest)
 		return
 	}
+	loan.IsDelinquent()
 
 	json.NewEncoder(w).Encode(loan)
 }

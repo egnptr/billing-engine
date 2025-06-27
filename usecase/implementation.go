@@ -7,6 +7,13 @@ import (
 )
 
 func (l *Loan) MakePayment(amount float64) (err error) {
+	// check no payment and the last week
+	if amount == 0 && l.CurrentWeek == l.TotalWeeks-1 {
+		err = fmt.Errorf("payment must be completed on the last week")
+		log.Println(err)
+		return
+	}
+
 	// check payment complete
 	if l.CurrentWeek >= l.TotalWeeks {
 		err = fmt.Errorf("loan already completed")
@@ -29,19 +36,22 @@ func (l *Loan) MakePayment(amount float64) (err error) {
 
 	// check for unpaid weeks
 	weeksUnpaid := 0
-	for i := 0; i < l.CurrentWeek; i++ {
+	for i := 0; i <= l.CurrentWeek; i++ {
 		if !l.Payments[i] {
 			weeksUnpaid++
 		}
 	}
 
 	// check amount is the exact amount
-	if weeksUnpaid > 0 {
-		newInstallment := l.Installment * float64(weeksUnpaid)
+	if weeksUnpaid > 1 {
+		newInstallment := l.Installment * float64(weeksUnpaid) // make 2 or more payment
 		if amount != newInstallment {
 			err = fmt.Errorf("%d weeks pending, payment must be %.f", weeksUnpaid, newInstallment)
 			log.Println(err)
 			return
+		}
+		for i := 0; i <= l.CurrentWeek; i++ {
+			l.Payments[i] = true
 		}
 	} else {
 		if amount != l.Installment {
@@ -49,10 +59,10 @@ func (l *Loan) MakePayment(amount float64) (err error) {
 			log.Println(err)
 			return
 		}
+		l.Payments[l.CurrentWeek] = true
 	}
 
 	l.Amount -= amount
-	l.Payments[l.CurrentWeek] = true
 	l.CurrentWeek++
 	return nil
 }
