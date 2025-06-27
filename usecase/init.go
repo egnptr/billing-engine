@@ -1,28 +1,32 @@
 package usecase
 
+import "fmt"
+
 type Loan struct {
-	ID           int64
-	InitalAmount float64
-	InterestRate float64
-	TotalWeeks   int
-	Installment  float64
-	Payments     []bool
-	CurrentWeek  int
-	IsDelinq     bool
+	ID          int64
+	Amount      float64
+	TotalWeeks  int
+	Installment float64
+	Payments    []bool
+	CurrentWeek int
+	IsDelinq    bool
 }
 
-func NewLoan(id int64, amount float64, interestRate float64, weeks int) *Loan {
+func NewLoan(id int64, amount float64, interestRate float64, weeks int) (*Loan, error) {
 	total := amount + (amount * interestRate)
 	installment := total / float64(weeks)
 
-	return &Loan{
-		ID:           id,
-		InitalAmount: amount,
-		InterestRate: interestRate,
-		TotalWeeks:   weeks,
-		Installment:  installment,
-		Payments:     make([]bool, weeks),
-		CurrentWeek:  0,
-		IsDelinq:     false,
+	if total == 0 || installment == 0 {
+		return &Loan{}, fmt.Errorf("invalid load")
 	}
+
+	return &Loan{
+		ID:          id,
+		Amount:      total,
+		TotalWeeks:  weeks,
+		Installment: installment,
+		Payments:    make([]bool, weeks),
+		CurrentWeek: 0,
+		IsDelinq:    false,
+	}, nil
 }

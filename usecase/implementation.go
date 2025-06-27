@@ -1,33 +1,64 @@
 package usecase
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+	"math"
+)
 
-func (l *Loan) MakePayment(amount float64) error {
+func (l *Loan) MakePayment(amount float64) (err error) {
+	// check payment complete
 	if l.CurrentWeek >= l.TotalWeeks {
-		return fmt.Errorf("loan already completed")
+		err = fmt.Errorf("loan already completed")
+		log.Println(err)
+		return
 	}
 
-	switch {
-	case amount == l.Installment:
-		l.Payments[l.CurrentWeek] = true
-	case amount == 0:
-		l.Payments[l.CurrentWeek] = false
-	default:
-		return fmt.Errorf("must pay either 0 or exact installment: %.2f", l.Installment)
+	// check no payment
+	if amount == 0 {
+		l.CurrentWeek++
+		return nil
 	}
 
+	// check exact amount
+	if math.Mod(amount, l.Installment) != 0 {
+		err = fmt.Errorf("payment must be multipler of %.f", l.Installment)
+		log.Println(err)
+		return
+	}
+
+	// check for unpaid weeks
+	weeksUnpaid := 0
+	for i := 0; i < l.CurrentWeek; i++ {
+		if !l.Payments[i] {
+			weeksUnpaid++
+		}
+	}
+
+	// check amount is the exact amount
+	if weeksUnpaid > 0 {
+		newInstallment := l.Installment * float64(weeksUnpaid)
+		if amount != newInstallment {
+			err = fmt.Errorf("%d weeks pending, payment must be %.f", weeksUnpaid, newInstallment)
+			log.Println(err)
+			return
+		}
+	} else {
+		if amount != l.Installment {
+			err = fmt.Errorf("payment must be the exact amount %.f", l.Installment)
+			log.Println(err)
+			return
+		}
+	}
+
+	l.Amount -= amount
+	l.Payments[l.CurrentWeek] = true
 	l.CurrentWeek++
 	return nil
 }
 
 func (l *Loan) GetOutstanding() float64 {
-	remaining := 0
-	for i := 0; i < l.TotalWeeks; i++ {
-		if !l.Payments[i] {
-			remaining += 1
-		}
-	}
-	return float64(remaining) * l.Installment
+	return l.Amount
 }
 
 func (l *Loan) IsDelinquent() bool {
@@ -35,16 +66,6 @@ func (l *Loan) IsDelinquent() bool {
 		return l.IsDelinq
 	}
 
-	var count int
-	for i := 0; i < l.CurrentWeek; i++ {
-		if !l.Payments[i] {
-			count++
-		}
-		if count > 2 {
-			l.IsDelinq = true
-			return l.IsDelinq
-		}
-	}
-
+	l.IsDelinq = !l.Payments[l.CurrentWeek-1] && !l.Payments[l.CurrentWeek-2]
 	return l.IsDelinq
 }
