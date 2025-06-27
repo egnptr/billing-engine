@@ -3,13 +3,13 @@ package usecase
 import "fmt"
 
 type Loan struct {
-	ID          int64
-	Amount      float64
-	TotalWeeks  int
-	Installment float64
-	Payments    []bool
-	CurrentWeek int
-	IsDelinq    bool
+	ID          int64   `json:"id"`
+	Amount      float64 `json:"amount"`
+	TotalWeeks  int     `json:"total_weeks"`
+	Installment float64 `json:"installment"`
+	Payments    []bool  `json:"payments"`
+	CurrentWeek int     `json:"current_week"`
+	IsDelinq    bool    `json:"delinquent"`
 }
 
 func NewLoan(id int64, amount float64, interestRate float64, weeks int) (*Loan, error) {
