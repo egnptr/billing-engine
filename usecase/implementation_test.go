@@ -62,7 +62,7 @@ func TestLoan_MakePayment(t *testing.T) {
 				TotalWeeks:  50,
 				Installment: 110000,
 				CurrentWeek: 3,
-				Payments:    []bool{true, false, false, false},
+				Payments:    []bool{true, true, false, false},
 			},
 			args: args{
 				amount: 220000,
@@ -110,6 +110,21 @@ func TestLoan_MakePayment(t *testing.T) {
 			},
 			args: args{
 				amount: 110000,
+			},
+			wantErr: true,
+		},
+		{
+			name: "case error no payment on the last week",
+			fields: fields{
+				ID:          1,
+				Amount:      500000,
+				TotalWeeks:  5,
+				Installment: 110000,
+				CurrentWeek: 4,
+				Payments:    []bool{true, false, false, false},
+			},
+			args: args{
+				amount: 0,
 			},
 			wantErr: true,
 		},
